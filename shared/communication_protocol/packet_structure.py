@@ -1,6 +1,6 @@
 # WHEN CHANGING SEPERATOR AND END - ALSO CHANGE REGEX ACCORDINGLY
-SEP = chr(29) + '\r'  # protocol seperator: group seperator + carriage return
-END = chr(4)  # end of packet marker
+SEP = b"\x1d\x0d"  # protocol seperator: group seperator + carriage return
+END = b"\x04"  # end of packet marker
 
 """
 "CODE": ("DESCRIPTION",
