@@ -8,13 +8,15 @@ PACKET_PATTERN = (
     r"^("  # starts with 
     r"\d{3}:[\w\x20]+\x1D\x0D"  # code and description
     r"([\w-]+:[\x20-\x7E]+\x1D\x0D)*"  # headers (zero or more)
-    r"\x04"  # end
-    r")$"  # ends with
+    r")"
+    
+    r".*"  # body
+    r"(\x04)$"  # ends with EOT
     # \x20-\x7E represents eve ascii character between space and ~
-)
+).encode()
 
 
-def is_valid_packet_syntax(content: str) -> bool:
+def is_valid_packet_syntax(content: bytes) -> bool:
     """
     Checks if a packets structure is correct.
     :param content: the string to check
@@ -26,38 +28,38 @@ def is_valid_packet_syntax(content: str) -> bool:
         return False
 
 
-def get_packet_code(packet: str) -> (str, str):
+def get_packet_code(packet: bytes) -> (str, str):
     """
     Gets the packet code and description from the raw packet string
     :param packet: the raw packet string
     :return: <packet code>,<packet string>
     """
-    return packet.split(structure.SEP)[0].split(":")
+    return packet.split(structure.SEP)[0].split(b":")
 
 
-def get_headers_dict(packet: str) -> dict:
+def get_headers_dict(packet: bytes) -> dict:
     """
     Gets the headers of the packet, and parses them into a dictionary
     :param packet: the raw packet string
     :return: a dictionary of the packet headers,  dict key -> header name and dict value -> header value
     """
-    header_lines = packet.split(structure.SEP)[1:-1]
+    header_structure_match = re.findall(r"([\w-]+:[\x20-\x7E]+\x1D\x0D)".encode(), packet)
     headers_dict = {}
-    for line in header_lines:
-        segments = line.split(":")
-        header, value = segments[0], ":".join(segments[1:])
+    for match in header_structure_match:
+        print(match)
+        segments = match.split(b":")
+        header, value = segments[0], b":".join(segments[1:])
         headers_dict[header] = value
     return headers_dict
 
 
 class PacketInfo:
-    def __init__(self, packet: str | bytes):
+    def __init__(self, packet: bytes):
         # Temporary assignment, only until parsing. Because the functions that parse the packet are unsafe until we
         # verify the packets' structure. After checking the packets' structure we can use the parsing method to assign
         # values to the attributes
-        self.code, self.desc, self.headers = None, None, None
-        if isinstance(packet, bytes):
-            packet = packet.decode(transmission.CHARSET)
+        self.code, self.desc, self.headers, self.body = None, None, None, None
+
         self.raw_packet = packet
         self.follows_pattern = is_valid_packet_syntax(packet)
 
