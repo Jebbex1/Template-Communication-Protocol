@@ -34,6 +34,8 @@ class Client:
             self.skt = self.tls_context.wrap_socket(self.skt, server_hostname=server_ipv4)
             print("TLS handshake successful")
 
+            transmission.send_packet(self.skt, b"HELLOOOOO")
+
         except ValueError as e:
             # intentionally raised value error - server did something that caused a problem
             print(e)

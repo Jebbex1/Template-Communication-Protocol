@@ -9,14 +9,14 @@ END = b"\x04"  # end of packet marker
             "header2name",
         ]),
 """
-CODES = {
-    # 0xx: Informational, handshake (both sides send)
+CODES: dict[str, tuple[str, list[str]]] = {
+    # 0xx: Informational, file uploads
 
 
-    # 1xx: Client cracking info and updates (only client sends)
+    # 1xx: Client requests and related (only client sends)
 
 
-    # 2xx: Server replies AND updates (only server sends)
+    # 2xx: Server replies, updates and related (only server sends)
 
 
     # 3xx: Client-specific connection termination messages (client sends to server)

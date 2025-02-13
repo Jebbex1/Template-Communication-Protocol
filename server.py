@@ -79,14 +79,10 @@ class Server:
             self.logger.info(f"Completed TLS handshake with client {utils.skt_addr(client_skt)}; using {tls_version}, "
                              f"with cipher {cipher}")
 
+            print(transmission.recv_packet(client_skt))
+
             # Do stuff
             pass
-
-        except ValueError as e:
-            # intentionally raised value error - client did something that caused a problem
-            self.logger.warning(e)
-            self.console_log(e)
-            self.disconnect_client(client_skt)
 
         except ConnectionError:
             # client disconnected and its socket raised a ConnectionError while trying to send or read data through it
