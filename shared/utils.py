@@ -1,8 +1,12 @@
 import socket
 from datetime import datetime
+from PIL import Image
+import io
+
+from shared.communication_protocol.packet_analyzer import PacketInfo
 
 
-def skt_addr(skt: socket.socket) -> str:
+def sock_name(skt: socket.socket) -> str:
     """
     Get socket address in the format ipv4:port
     :param skt: the socket interface we want to get the address of
@@ -13,3 +17,24 @@ def skt_addr(skt: socket.socket) -> str:
 
 def ftime():
     return datetime.now().strftime("%d-%m-%Y %H:%M:%S.%f")[:-3]
+
+
+def get_dissconnect_packet_line(packet: PacketInfo):
+    match packet.code:
+        case "401":
+            return f"{packet.desc}: {packet.headers["description"]}"
+        case "402":
+            return f"{packet.desc}: {packet.headers["description"]}"
+        case "500":
+            return f"{packet.desc}: {packet.headers["reason"]}"
+        case "503":
+            return f"{packet.desc}: {packet.headers["description"]}"
+        case _:
+            return packet.desc
+
+
+def save_ssl_context(obj):
+    return obj.__class__, (obj.protocol,)
+
+
+
